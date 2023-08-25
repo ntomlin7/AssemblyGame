@@ -1,0 +1,173 @@
+/Nathan Tomlin
+
+ORG 		100
+
+valueMsg,	LOADI		enterValue		/Loads the value associated with the starting memory address of enterValue
+		SKIPCOND	400			/Check if were at end of the array since the last value in array is 000 
+		JUMP		printMsg1		/Jump to the printMsg1 where we will output the message one array index at a time if the array is not at the end
+		JUMP		makeAGuess
+printMsg1,	OUTPUT					/Outputs the  value associated with the memory address that was loaded into accumulator
+		LOAD		enterValue
+		ADD		one			/Loads the memory address itself, incremints it by 1 which moves it to the next address in the array
+		STORE		enterValue		/Store this new address at enterValue
+		JUMP		valueMsg		/Jump back to top in order to repeat until all values of loop have been printed
+		
+
+
+makeAGuess, 	INPUT
+		STORE 		userInput
+		JUMP		youEntered
+
+youEntered, 	LOADI		youEnterMsg		/Loads the value associated with the starting memory address of youEnterMsg to display "You Entered"
+		SKIPCOND	400			/Check if were at end of the array since the last value in array is 000 
+		JUMP		printYouMsg		/Jump to the printYouMsg where we will output the message one array index at a time if the array is not at the end
+		JUMP		resetEnter		/Once we reach the end of the array, we will jump tp resetEnter, in order to reset the array back to its starting address in memory
+resetEnter, 	LOAD		youEnterPtr		/Loading memory address of pointer pointing to the starting address of the youEnterMsg array
+		STORE		youEnterMsg		/Setting the memory address of the array youEnterMsg equal to its starting address, so when this is called again we can print the same message
+		JUMP		checkHigh		/We will now jump to checkHigh  to begin checking the value to see if it is too high 
+
+
+printYouMsg,  	OUTPUT
+		LOAD		youEnterMsg		/Loads the memory address itself, incremints it by 1 which moves it to the next address in the array
+		ADD		one
+		STORE		youEnterMsg		/Store this new address at youEnterMsg
+		JUMP		youEntered		/Jump back to top in order to repeat until all values of loop have been printed
+
+
+
+checkHigh, 	LOAD 		userInput		/Loading to output guess then check if value is positive. If it is, jump to outputHigh, if not jump to checkLow
+		OUTPUT					/Outputs what the user entered as their guess
+		SUBT 		magicNumber		
+		SKIPCOND 	800	
+		JUMP 		checkLow		/Jumping to check and see if the number is negative which means it is too low
+		JUMP		outputHigh		/Jump to output the message "Too High"
+			
+checkLow, 	LOAD		userInput		/Checking here to see if the userInput is too low by subtracting the magic number from it.
+		SUBT 		magicNumber
+		SKIPCOND 	000			/If the result is negative, the userInput is too low, if not the user wins the game
+		JUMP		youWin			/Since we already checked if the userInput was too hogh or too low, then the only remaining condition is that the user guessed the right number.
+		JUMP		outputLow		/If the number is too low, jump to outputLow to display the message "Too Low"
+
+
+
+outputHigh, 	LOADI 		TooHighMsg		/Loads the value associated with the starting memory address of TooHighMsg to display "Too High"
+		SKIPCOND	400			/Check if were at end of array since last value in array is 000
+		JUMP		printHigh		/Jump to printHigh where we will output the message one index at a time if the array is not at the end
+		JUMP		resetHigh		/Since we may need to print this more than once, jump to resetHigh to set array back to its starting point in memory
+printHigh,	OUTPUT
+		LOAD		TooHighMsg		/Loads the memory address itself, incremints it by 1 which moves it to the next address in the array
+		ADD		one
+		STORE		TooHighMsg		/Store this new address at TooHighMsg
+		JUMP		outputHigh	        /Jump back to top in order to repeat until all values of loop have been printed
+resetHigh,	LOAD		TooHighPtr		/Loads a pointer that points to the starting address of the array TooHighMsg
+		STORE		TooHighMsg		/Reset array by setting TooHighMsg equal to the memory address of TooHighPtr, which is the starting address of the arrray.
+		JUMP		makeAGuess
+
+
+
+outputLow, 	LOADI		TooLowMsg		/Loads the value associated with the starting memory address of TooLowMsg to display "Too Low"
+		SKIPCOND	400			/Check if were at end of array since last value in array is 000
+		JUMP		printLow		/Jump to printLow where we will output the message one index at a time if the array is not at the end
+		JUMP		resetLow		/Since we may need to print this more than once, jump to resetLow to set array back to its starting point in memory
+printLow,	OUTPUT	
+		LOAD		TooLowMsg		/Loads the memory address itself, incremints it by 1 which moves it to the next address in the array
+		ADD		one
+		STORE		TooLowMsg		/Store this new address at TooLowMsg
+		JUMP 		outputLow		/Jump back to top in order to repeat until all values of loop have been printed
+resetLow,	LOAD		TooLowPtr		/Loads a pointer that points to the starting address of the array TooLowMsg
+		STORE		TooLowMsg		/Reset array by setting TooLowMsg equal to the memory address of TooLowPtr, which is the starting address of the arrray.
+		JUMP		makeAGuess
+
+
+youWin, 	LOADI		youWinMsg		/Load the value associated with the memory address of the youWinMsg array to display "You Win"
+		SKIPCOND	400			/Check if were at the end of array since the last value in array is 000
+		JUMP		printWin		/Jump to printWin to begin outputting the message one index at a time, until we hit the end of the array
+		HALT					/Once array is fully printed, skipcond will activate and we will halt the program, as we have done everything
+printWin, 	OUTPUT
+		LOAD		youWinMsg		/Inreminting memory address of youWinMsg, in order to get the next value from memory
+		ADD		one
+		STORE		youWinMsg		/Storing this incremented value so we can reference it the next time we loop
+		JUMP		youWin			/Jumping back to youWin, so we can repeat until finished
+
+
+
+magicNumber, 	Dec		56
+userInput, 	Dec		0
+one,		Dec 		1
+
+enterValue, 	Hex		148	
+		Dec		69			/E in ascii
+		Dec		110			/n in ascii
+		Dec 		116			/t in ascii
+		Dec		101			/e in ascii
+		Dec		114			/r in ascii
+		Dec		32			/SPACE in ascii
+		Dec		65			/A in ascii
+		Dec		32			/SPACE in ascii
+		Dec 		86			/V in ascii
+		Dec		97			/a in ascii
+		Dec		108			/l in ascii
+		Dec		117			/u in ascii
+		Dec 		101			/e in ascii
+		Dec		13			/Newline keyword in ascii
+		Dec		000			/0 in ascii
+
+youEnterPtr,    Hex		159
+youEnterMsg, 	Hex		159
+		Dec		13			/newline in ascii
+		Dec 		89			/Y in ascii
+		Dec		111			/o in ascii
+		Dec		117			/u in ascii
+		Dec 		32			/space in ascii
+		Dec		69			/E in ascii
+		Dec		110			/n in ascii
+		Dec		116			/t in ascii
+		Dec		101			/e in ascii
+		Dec		114			/r in ascii
+		Dec 		101			/e in ascii
+		Dec 		100			/d in ascii
+		Dec		32			/space in ascii
+		Dec		000			/0 in ascii
+
+TooHighPtr, 	HEX		169			
+TooHighMsg,	HEX		169
+		Dec		13			/newline in ascii
+		Dec		84			/T in ascii
+		Dec		111			/o in ascii
+		Dec 		111			/o in ascii
+		Dec		32			/space in ascii
+		Dec		72			/H in ascii
+		Dec		105			/i in ascii
+		Dec		103			/g in ascii
+		Dec		104			/h in ascii
+		Dec		13			/newline in ascii
+		Dec		000			/0 in ascii
+	
+TooLowPtr, 	Hex		176			
+TooLowMsg, 	Hex 		176
+		Dec		13			/newline in ascii
+		Dec		84			/T in ascii
+		Dec		111			/o in ascii
+		Dec		111			/o in ascii
+		Dec		32			/space in ascii
+		Dec		76			/L in ascii
+		Dec		111			/o in ascii
+		Dec		119			/w in ascii
+		Dec		13			/newline in ascii
+		Dec		000			/0 in ascii
+
+youWinMsg, 	Hex 		181			
+		Dec		13			/newline in ascii
+		Dec		89			/Y in ascii
+		Dec		111			/o in ascii
+		Dec		117			/u in ascii
+		Dec 		32			/space in ascii
+		Dec		87			/W in ascii
+		Dec		105			/i in ascii
+		Dec		110			/n in ascii
+		Dec		000			/0 in ascii
+
+
+
+
+
